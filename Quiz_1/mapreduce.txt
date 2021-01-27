@@ -1,0 +1,174 @@
+Input to the mapper : (1, "20,Male,Ames,IA,USA,25000")
+		      (2, "24,Male,Ames,IA,USA,29000")
+		      (3, "24,Female,Sunnyvale,CA,USA,57000")
+
+Mapper code:
+
+map (k, v) {
+
+// Split the words if a comma is encountered
+tokens = v.split (“,”)
+
+// checking if the format is correct and the age > 15
+if ( len(tokens) == 6 AND
+isnumeric(token[0]) AND 
+token[1] in ('Male', 'Female') AND
+ischaracter(token[2]) AND
+len(token[3]) == 2 AND
+ischaracter(token[4]) AND
+isnumeric(token[5]) AND 
+token[0] > 15) 
+
+// if the above conditions are satisfied then output the following
+	{
+	emit (token[0], token[5])
+	emit ("unique-cities", token[2])
+		if (token[1] == "Male") {
+			emit ("number-of-males", 1) }
+		else {
+			emit ("number-of-females", 1)}
+	}
+}
+
+Output from the mapper:
+Output for the first record: (20, 25000)
+			     ("unique-cities", Ames)
+			     ("number-of-males", 1)
+
+Output for the second record: (24, 29000)
+			     ("unique-cities", Ames)
+			     ("number-of-males", 1)
+
+Output for the third record: (24, 57000)
+			     ("unique-cities", Sunnyvale)
+			     ("number-of-females", 1)
+
+Ouput from sort and shuffle:
+
+
+(20, [25000, 24000, 26000])
+(24, [29000, 57000, 34000]) 
+(40, [43000, 44000, 48000])
+
+Similarly for "unique-cities" as the key, all its values will be displayed as:
+("unique-cities", [Ames, Ames, Sunnyvale, Ames,......, Boone )
+
+For "number-of-males" as the key:
+("number-of-males", [1,1,1,1,1,1,1])
+
+For "number-of-females" as the key:
+("number-of-females", [1,1,1])
+
+
+reduce(k, v) {
+
+// Check to see if the key is age i.e. a number
+	if (isnumeric(k)) {
+	   count = 0, sum = 0
+	   for i in v {
+	   count = count + 1
+	   sum = sum + i
+	   }
+	avg = sum/count
+	emit (k, avg)
+	} 
+
+// Else check if the key contains "unique-cities"
+        elseif (k == "unique-cities") {
+	         list = []
+	  	 list = list.append(unique(v))	  
+	  	 emit (k, list)
+	}	
+
+// Else check if the key contains "number-of-males"
+	elseif (k == "number-of-males") {
+	   	sum = 0
+		for i in v {
+		sum = sum + i	
+		}
+		emit (k, sum)
+        }
+
+// Else emit the output for "number-of-females"
+        else { 
+	     sum = 0
+	     for i in v {
+	     sum = sum + i	
+	        }
+	     emit (k, sum)
+	}
+}
+Output of reducer:
+
+(20, 25000)
+(24, 40000)
+(40, 45000)
+
+If the input to the reducer node is 
+(20, [25000, 24000, 26000])
+(24, [29000, 57000, 34000]) 
+(40, [43000, 44000, 48000])
+
+Then the output from the reducer after calculating the average salary for that age will be:
+(20, 25000)
+(24, 40000)
+(40, 45000)
+
+Similarly if the input is :
+("unique-cities", [Ames, Ames, Sunnyvale, Ames,......, Boone )
+
+The output would be:
+("unique-cities", [Ames, Sunnyvale, Boone, Cupertino])
+
+If the input to the reducers is :
+(20, [25000, 24000, 26000])
+(24, [29000, 57000, 34000]) 
+(40, [43000, 44000, 48000])
+("unique-cities", [Ames, Ames, Sunnyvale, Ames,......, Boone])
+("number-of-males", [1,1,1,1,1,1,1])
+("number-of-females", [1,1,1])
+
+The ouput from all the reducers would be:
+(20, 25000)
+(24, 40000)
+(40, 45000)
+("unique-cities", [Ames, Sunnyvale, Boone, Cupertino])
+("number-of-males", 7)
+("number-of-females", 3)
+
+if ( len(tokens) == 6 AND
+isnumeric(token[0]) AND 
+token[1] in ('Male', 'Female') AND
+ischaracter(token[2]) AND
+ischaracter(token[3]) AND
+len(token[3]) == 2 AND
+ischaracter(token[4]) AND
+isnumeric(token[5]) AND token[0] > 15) {
+
+
+map (k, v) {
+// Split the words if a comma is encountered
+tokens = v.split (“,”)
+// checking if the format is correct and the age > 15
+// Assuming isnumeric function returns TRUE for numeric values
+// Assuming ischarater function returns TRUE for character values
+if ( len(tokens) == 6 AND
+isnumeric(token[0]) AND 
+token[1] in ('Male', 'Female') AND
+ischaracter(token[2]) AND
+len(token[3]) == 2 AND
+ischarater(token[3]) AND
+ischaracter(token[4]) AND
+isnumeric(token[5]) AND 
+token[0] > 15) //Check for age filter
+
+{
+// if the above conditions are satisfied then output the following
+             emit (token[0], token[5])
+             emit ("unique-cities", token[2])
+                        if (token[1] == "Male") {
+                              emit ("number-of-males", 1) }
+                        else {
+                                emit ("number-of-females", 1)}
+                        }
+}
