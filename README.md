@@ -1,4 +1,4 @@
-# About
+# Learnings from the course
 
 1. Understanding the fundamentals of big data and MapReduce
 
